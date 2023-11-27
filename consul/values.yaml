@@ -9,6 +9,9 @@ global:
     enabled: true
     enableAutoEncrypt: true
     verify: true
+  metrics:
+    enabled: true
+    enableGatewayMetrics: true
 
 server:
   enabled: true
@@ -26,8 +29,18 @@ connectInject:
   apiGateway:
     managedGatewayClass:
       serviceType: LoadBalancer
+  metrics:
+    defaultEnabled: true # by default, this inherits from the value global.metrics.enabled
+    defaultEnableMerging: false
 
 ui:
   enabled: true
   service:
     type: LoadBalancer
+  metrics:
+    enabled: true # by default, this inherits from the value global.metrics.enabled
+    provider: "prometheus"
+    baseURL: http://prometheus-server #prometheus-server.consul.svc.cluster.local
+
+prometheus:
+  enabled: true

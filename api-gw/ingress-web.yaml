@@ -5,18 +5,7 @@ metadata:
   name: api-gateway-hashicups
 spec:
   destination:
-    name: frontend
-  sources:
-    - name: api-gateway
-      action: allow
----
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceIntentions
-metadata:
-  name: api-gateway-hashicups-v2
-spec:
-  destination:
-    name: frontend-v2
+    name: web
   sources:
     - name: api-gateway
       action: allow
@@ -37,10 +26,5 @@ spec:
         value: /
     backendRefs:
     - kind: Service
-      name: frontend
-      port: 3000
-      weight: 60
-    - kind: Service
-      name: frontend-v2
-      port: 3000
-      weight: 40
+      name: web
+      port: 9091

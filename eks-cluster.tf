@@ -51,7 +51,7 @@ module "eks" {
 resource "null_resource" "kubernetes_consul_resources" {
   provisioner "local-exec" {
     when    = destroy
-    command = "kubectl delete svc/consul-ui --namespace consul && kubectl delete svc/api-gateway --namespace consul"
+    command = "kubectl delete svc/consul-ui --namespace consul && kubectl delete svc/api-gateway --namespace consul && kubectl delete svc/prometheus-server --namespace consul"
   }
   depends_on = [module.eks]
 }
