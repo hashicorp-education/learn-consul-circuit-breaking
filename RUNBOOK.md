@@ -4,22 +4,11 @@ Deploy infrastructure
 Set up `kubectl`
 `aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw cluster_id)`
 
-Install Consul
-`consul-k8s install -config-file=consul/values.yaml`
-
-Deploy Web and API services
-`kubectl apply --filename k8s-services/web.yaml`
-`kubectl apply --filename k8s-services/api-success.yaml`
-
-Deploy Consul API gateway and route it towards Web
-`kubectl apply --filename api-gw/consul-api-gateway.yaml`
-`kubectl apply --filename api-gw/ingress-web.yaml`
-
-Access the Consul-UI
-`kubectl port-forward -n consul service/consul-ui 8080:443 > /dev/null 2>&1 &`
-Token:
+Access the Consul Token:
 `export CONSUL_HTTP_TOKEN=$(kubectl --namespace consul get secrets consul-bootstrap-acl-token --template='{{.data.token | base64decode}}') && echo $CONSUL_HTTP_TOKEN`
-Open [Consul-UI](https://localhost:8080/ui/) and 
+
+Open the Consul UI URL and log in using the token from the previous step:
+`export CONSUL_UI=https://$(kubectl --namespace consul get services consul-ui -o jsonpath='{ .status.loadBalancer.ingress[].hostname }') && echo $CONSUL_UI`
 
 Access the Web service
 `kubectl --namespace consul get services api-gateway -o jsonpath='{ .status.loadBalancer.ingress[].hostname }'`
@@ -27,10 +16,11 @@ Open Web, refresh a few times, observe the Upstream destination alternate betwee
 Observe the Consul UI traffic metrics for `web` <-> `api`.
 
 Simulate upstream HTTP 5xx errors for api-v2
-`kubectl apply --filename k8s-services/api-fail.yaml`
+`kubectl apply --filename k8s-services/failing-service-api.yaml`
 
 Refresh the Web page a few times, observe that `api-v2` fails twice as upstream and then no longer appears.
-Observe the [Consul-UI](https://localhost:8080/ui/dc1/services/web/topology) traffic metrics for `web` <-> `api` show errors.
+Observe the Consul-UI traffic metrics for `web` <-> `api` show errors.
+`echo $CONSUL_UI/ui/dc1/services/web/topology`
 
 Observe the Prometheus tripping of Envoy outlier detection for url
 `kubectl port-forward -n consul service/prometheus-server 9090:80 > /dev/null 2>&1 &`
