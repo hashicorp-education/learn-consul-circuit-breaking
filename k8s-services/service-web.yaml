@@ -35,7 +35,7 @@ spec:
         maxConcurrentRequests: 5
       passiveHealthCheck:
         interval: "30s" # retry period after upstream fails
-        maxFailures: 2 # how many failures before ejection (circuit breaking)
+        maxFailures: 5 # how many failures before ejection (circuit breaking)
         # defaults:
         # enforcingConsecutive5xx: 100 # [%] of likelihood to eject a detected failed upstream
         # maxEjectionPercent: 10 # [%] of the upstream service instances allowed to be ejected
@@ -82,3 +82,16 @@ spec:
               value: "web"
             - name: SERVER_TYPE
               value: "http"
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: web
+spec:
+  destination:
+    name: web
+  sources:
+    - name: api-gateway
+      action: allow
+    - name: traffic-generator
+      action: allow

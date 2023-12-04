@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: traffic-generator
+  namespace: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traffic-generator
+  namespace: default
+spec:
+  selector:
+    app: traffic-generator
+  ports:
+  - port: 8080
+    targetPort: 8080
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: traffic-generator
+  namespace: default
+spec:
+  protocol: "http"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  labels:
+    app: traffic-generator
+  name: traffic-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traffic-generator
+  template:
+    metadata:
+      namespace: default
+      annotations:
+        consul.hashicorp.com/connect-inject: "true"
+        consul.hashicorp.com/transparent-proxy: "true"
+      labels:
+        app: traffic-generator
+    spec:
+      containers:
+      - name: traffic-generator
+        image: fortio/fortio:latest_release
+        args: ["load", "-t", "0", "-qps", "1", "http://web:9091/"]
+        ports:
+        - containerPort: 8080
+          name: http-fortio
+        - containerPort: 8079
+          name: grpc-ping
+        volumeMounts:
+        - name: reports
+          mountPath: /var/lib/fortio
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100M
+          requests:
+            cpu: 100m
+            memory: 100M
+      volumes:
+      - name: reports
+        emptyDir:
+            medium: Memory
+      serviceAccountName: traffic-generator

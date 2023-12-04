@@ -1,15 +1,3 @@
----
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceIntentions
-metadata:
-  name: api-gateway-hashicups
-spec:
-  destination:
-    name: web
-  sources:
-    - name: api-gateway
-      action: allow
----
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
@@ -27,4 +15,5 @@ spec:
     backendRefs:
     - kind: Service
       name: web
+      namespace: default
       port: 9091
