@@ -1,9 +1,17 @@
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_name
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
+}
+
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "18.26.6"
+  version = "19.20.0"
 
   cluster_name    = local.cluster_name
-  cluster_version = "1.26"
+  cluster_version = "1.27"
 
   cluster_addons = {
     aws-ebs-csi-driver = { most_recent = true }
@@ -11,14 +19,15 @@ module "eks" {
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
+  cluster_endpoint_public_access = true
 
   eks_managed_node_group_defaults = {
     ami_type = "AL2_x86_64"
 
     # Needed by the aws-ebs-csi-driver
-    iam_role_additional_policies = [
-      "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-    ]
+    iam_role_additional_policies = {
+      AmazonEBSCSIDriverPolicy = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+    }
 
     # Disabling and using externally provided security groups
     create_security_group = false
