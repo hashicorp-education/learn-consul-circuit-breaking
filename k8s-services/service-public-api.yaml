@@ -123,3 +123,50 @@ spec:
             requests:
               cpu: 100m
               memory: 100M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: public-api-v3
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: public-api
+      app: public-api
+  template:
+    metadata:
+      labels:
+        service: public-api
+        app: public-api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9102"
+        consul.hashicorp.com/connect-inject: "true"
+        consul.hashicorp.com/service-meta-version: "3"
+        consul.hashicorp.com/service-tags: "v3"
+    spec:
+      serviceAccountName: public-api
+      containers:
+        - name: public-api
+          image: hashikrastin/public-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: BIND_ADDRESS
+              value: ":8080"
+            - name: PRODUCT_API_URI
+              value: "http://product-api:9090"
+            - name: PAYMENT_API_URI
+              value: "http://payments:1800"
+            - name: ERROR_RATE
+              value: "0"
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100M
+            requests:
+              cpu: 100m
+              memory: 100M

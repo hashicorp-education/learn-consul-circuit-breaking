@@ -20,17 +20,11 @@ Simulate upstream HTTP 5xx errors for api-v2
 Observe the Consul-UI traffic metrics for `public-api` show errors.
 `echo $CONSUL_UI/ui/dc1/services/web/topology`
 
-Apply circuit-breaking parameters for the `public-api` service.
-`kubectl apply --filename k8s-services/servicedefaults-public-api.yaml`
-
-Then redeploy the failing `public-api` services and their service mesh proxies.
-`kubectl rollout restart deployment/public-api-v2`
-`kubectl rollout restart deployment/public-api-v3`
-
--- At this point we have trouble with traffic-generator pod dying.
+Apply circuit-breaking parameters for the `traffic-generator` service.
+`kubectl apply --filename k8s-services/servicedefaults-traffic-generator.yaml`
 
 Observe the Consul-UI traffic metrics for `public-api` show errors trigger and then stop as non-functioning `public-api` service instances are ejected from the upstream destination pool.
-`echo $CONSUL_UI/ui/dc1/services/web/topology`
+`echo $CONSUL_UI/ui/dc1/services/public-api/topology`
 
 Observe the Prometheus tripping of Envoy outlier detection for url
 `kubectl port-forward -n consul service/prometheus-server 9090:80 > /dev/null 2>&1 &`

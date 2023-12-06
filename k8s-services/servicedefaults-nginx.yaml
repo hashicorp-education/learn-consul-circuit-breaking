@@ -1,7 +1,7 @@
 apiVersion: consul.hashicorp.com/v1alpha1
 kind: ServiceDefaults
 metadata:
-  name: public-api
+  name: nginx
   namespace: default
 spec:
   protocol: http
@@ -13,8 +13,8 @@ spec:
         maxPendingRequests: 40
         maxConcurrentRequests: 50
       passiveHealthCheck:
-        interval: "1s"
-        maxFailures: 20
+        interval: "5s"
+        maxFailures: 3
         enforcingConsecutive5xx: 100
-        maxEjectionPercent: 90
-        baseEjectionTime: "3s"
+        maxEjectionPercent: 100
+        baseEjectionTime: "10s"
