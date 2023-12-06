@@ -48,7 +48,7 @@ spec:
       containers:
       - name: traffic-generator
         image: fortio/fortio:latest_release
-        args: ["load", "-t", "0", "-qps", "1", "http://web:9091/"]
+        args: ["load", "-t", "0", "-qps", "20", "http://public-api:8080/api"]
         ports:
         - containerPort: 8080
           name: http-fortio

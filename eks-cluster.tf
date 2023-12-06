@@ -42,7 +42,7 @@ module "eks" {
     one = {
       name = "node-group-1"
 
-      instance_types = ["t3.small"]
+      instance_types = ["t3.medium"]
 
       min_size     = 1
       max_size     = 3
@@ -54,14 +54,3 @@ module "eks" {
     }
   }
 }
-
-/* # Uninstalls consul resources (API Gateway controller, Consul-UI, and AWS ELB, and removes associated AWS resources)
-# on terraform destroy
-resource "null_resource" "kubernetes_consul_resources" {
-  provisioner "local-exec" {
-    when    = destroy
-    command = "kubectl delete svc/consul-ui --namespace consul && kubectl delete svc/api-gateway --namespace consul && kubectl delete svc/prometheus-server --namespace consul"
-  }
-  depends_on = [module.eks]
-}
- */
