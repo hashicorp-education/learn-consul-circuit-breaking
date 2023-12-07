@@ -1,4 +1,4 @@
-# Learn Consul - Canary deployments with service splitters
+# Learn Consul - Circuit breaking
 
 This is a companion repo to the [Implement circuit breakers to improve service resilience](https://developer.hashicorp.com/consul/tutorials/resiliency/service-mesh-circuit-breaking), containing sample configuration to:
 
